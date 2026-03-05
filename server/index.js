@@ -11,7 +11,14 @@ const taskRoutes = require('./routes/tasks');
 
 const app = express();
 
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+app.use(cors({
+  // Allow the local dev client and the live site
+  origin: [
+    'http://localhost:5173',
+    'https://esmondmccain.com',
+  ],
+  credentials: true,
+}));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);

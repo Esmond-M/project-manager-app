@@ -12,7 +12,8 @@ import ProjectDetail from './pages/ProjectDetail';
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      {/* basename matches the subfolder on the live site; Vite sets BASE_URL from the base config */}
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <Routes>
           <Route path="/login"    element={<Login />} />
           <Route path="/register" element={<Register />} />
