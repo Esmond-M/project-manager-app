@@ -1,3 +1,6 @@
+// NOTE: Keep all user-facing messages neutral and practical.
+// Don't reference portfolio, demo, or test purposes in comments,
+// API responses, or error messages visible to end users.
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');

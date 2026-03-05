@@ -1,3 +1,5 @@
+// NOTE: This is a real-use app. Avoid demo/portfolio language in UI text,
+// placeholders, or comments that end users might see.
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';

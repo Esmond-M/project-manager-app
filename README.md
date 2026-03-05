@@ -1,8 +1,8 @@
 # Project Manager App
 
-A full-stack SaaS-style project management app built for portfolio use and day-to-day tracking.
+A lightweight project and task management tool. Track what you're working on, break it into tasks, and keep an eye on progress — without the bloat of tools like Jira or Asana.
 
-## Stack
+## Tech Stack
 
 - **Frontend:** React 18, Vite 5, React Router 6
 - **Backend:** Node.js, Express
@@ -11,26 +11,32 @@ A full-stack SaaS-style project management app built for portfolio use and day-t
 
 ## Features
 
-- User registration & login (JWT auth)
-- Create, edit, delete projects with status tracking
-- Add tasks to projects (open / in-progress / done)
-- Dashboard with project overview
-- Role-aware data (each user sees only their own projects)
+- Register and log in — each account is isolated, no data bleed between users
+- Create projects with status (active / on-hold / completed), priority, and due date
+- Add tasks per project and move them through open → in-progress → done
+- Dashboard overview with live stats and progress tracking
+- Clean dark UI, no external component library
 
-## Getting Started
+## Running Locally
 
-### 1. Server
+### Backend
 ```bash
 cd server
-cp .env.example .env     # fill in JWT_SECRET
+copy .env.example .env   # then set your own JWT_SECRET
 node index.js
 ```
 
-### 2. Client
+### Frontend
 ```bash
 cd client
 npm run dev
 ```
 
-Server runs on `http://localhost:5000`  
-Client runs on `http://localhost:5173`
+API: `http://localhost:5000`  
+App: `http://localhost:5173`
+
+## Notes
+
+- The database file (`server/projects.db`) is created automatically on first run — no setup needed
+- `.env` is gitignored; never commit real secrets
+- To reset all data, delete `projects.db` and restart the server
