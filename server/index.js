@@ -12,9 +12,10 @@ const taskRoutes = require('./routes/tasks');
 const app = express();
 
 app.use(cors({
-  // Allow the local dev client and the live site
+  // Allow the local dev client, local XAMPP site, and the live site
   origin: [
     'http://localhost:5173',
+    'https://site.test',
     'https://esmondmccain.com',
   ],
   credentials: true,
