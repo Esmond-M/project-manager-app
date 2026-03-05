@@ -291,3 +291,23 @@ textarea { resize: vertical; min-height: 80px; }
   margin: 4rem auto;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 1rem;
+}
+.loading-screen .spinner {
+  margin: 0;
+}
+.loading-slow-msg {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+  max-width: 280px;
+  animation: fadeIn 0.4s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
