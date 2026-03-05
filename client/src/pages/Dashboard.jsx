@@ -21,6 +21,7 @@ export default function Dashboard() {
   const active    = projects.filter((p) => p.status === 'active').length;
   const onHold    = projects.filter((p) => p.status === 'on-hold').length;
   const completed = projects.filter((p) => p.status === 'completed').length;
+  const overdue   = projects.filter((p) => isOverdue(p)).length;
   const totalTasks = projects.reduce((s, p) => s + (p.task_count ?? 0), 0);
   const doneTasks  = projects.reduce((s, p) => s + (p.done_count ?? 0), 0);
 
@@ -61,6 +62,12 @@ export default function Dashboard() {
             <div className="stat-value">{totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0}%</div>
             <div className="stat-label">Tasks Done</div>
           </div>
+          {overdue > 0 && (
+            <div className="stat-card">
+              <div className="stat-value" style={{ color: 'var(--color-danger)' }}>{overdue}</div>
+              <div className="stat-label">Overdue</div>
+            </div>
+          )}
         </div>
 
         <div className="topbar">
@@ -107,7 +114,8 @@ function ProjectCard({ project, onClick }) {
       )}
       <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
         <span className={`badge badge-${project.status}`}>{project.status}</span>
-        {project.due_date && (
+        {isOverdue(project) && <span className="badge badge-overdue">overdue</span>}
+        {!isOverdue(project) && project.due_date && (
           <span className="badge badge-low">Due {project.due_date}</span>
         )}
       </div>
@@ -128,4 +136,9 @@ function greeting() {
   if (h < 12) return 'morning';
   if (h < 17) return 'afternoon';
   return 'evening';
+}
+
+function isOverdue(project) {
+  if (!project.due_date || project.status === 'completed') return false;
+  return new Date(project.due_date) < new Date(new Date().toDateString());
 }

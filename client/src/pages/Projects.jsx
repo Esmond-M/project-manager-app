@@ -11,6 +11,7 @@ export default function Projects() {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing]     = useState(null);
   const [filter, setFilter]       = useState('all');
+  const [search, setSearch]       = useState('');
 
   useEffect(() => {
     api.get('/projects')
@@ -42,7 +43,13 @@ export default function Projects() {
     setShowModal(true);
   }
 
-  const filtered = filter === 'all' ? projects : projects.filter((p) => p.status === filter);
+  const statusFiltered = filter === 'all' ? projects : projects.filter((p) => p.status === filter);
+  const filtered = search.trim()
+    ? statusFiltered.filter((p) =>
+        p.title.toLowerCase().includes(search.toLowerCase()) ||
+        (p.description ?? '').toLowerCase().includes(search.toLowerCase())
+      )
+    : statusFiltered;
 
   return (
     <div className="layout">
@@ -58,17 +65,25 @@ export default function Projects() {
           </button>
         </div>
 
-        {/* Filter tabs */}
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
-          {['all', 'active', 'on-hold', 'completed'].map((s) => (
-            <button
-              key={s}
-              className={`btn btn-sm ${filter === s ? 'btn-primary' : 'btn-ghost'}`}
-              onClick={() => setFilter(s)}
-            >
-              {s === 'all' ? 'All' : s}
-            </button>
-          ))}
+        {/* Search + filter row */}
+        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search projects…"
+            style={{ flex: '1', minWidth: '180px' }}
+          />
+          <div style={{ display: 'flex', gap: '0.4rem' }}>
+            {['all', 'active', 'on-hold', 'completed'].map((s) => (
+              <button
+                key={s}
+                className={`btn btn-sm ${filter === s ? 'btn-primary' : 'btn-ghost'}`}
+                onClick={() => setFilter(s)}
+              >
+                {s === 'all' ? 'All' : s}
+              </button>
+            ))}
+          </div>
         </div>
 
         {loading && <div className="spinner" />}
@@ -94,7 +109,8 @@ export default function Projects() {
                 )}
                 <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                   <span className={`badge badge-${p.status}`}>{p.status}</span>
-                  {p.due_date && <span className="badge badge-low">Due {p.due_date}</span>}
+                  {isOverdue(p) && <span className="badge badge-overdue">overdue</span>}
+                  {!isOverdue(p) && p.due_date && <span className="badge badge-low">Due {p.due_date}</span>}
                 </div>
                 <div className="project-card-footer">
                   <div className="progress-wrap">
@@ -123,4 +139,9 @@ export default function Projects() {
       </main>
     </div>
   );
+}
+
+function isOverdue(project) {
+  if (!project.due_date || project.status === 'completed') return false;
+  return new Date(project.due_date) < new Date(new Date().toDateString());
 }
