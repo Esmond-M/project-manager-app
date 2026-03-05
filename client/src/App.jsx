@@ -1,6 +1,6 @@
 // NOTE: This is a real-use app. Avoid demo/portfolio language in UI text,
 // placeholders, or comments that end users might see.
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
@@ -13,7 +13,7 @@ export default function App() {
   return (
     <AuthProvider>
       {/* basename matches the subfolder on the live site; Vite sets BASE_URL from the base config */}
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <HashRouter>
         <Routes>
           <Route path="/login"    element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -22,7 +22,7 @@ export default function App() {
           <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </AuthProvider>
   );
 }
