@@ -98,6 +98,8 @@ h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }
 }
 .btn-primary { background: var(--color-primary); color: #fff; }
 .btn-primary:hover { background: var(--color-primary-h); }
+.btn-secondary { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
+.btn-secondary:hover { border-color: var(--color-primary); color: var(--color-primary); }
 .btn-ghost { background: transparent; color: var(--color-muted); border: 1px solid var(--color-border); }
 .btn-ghost:hover { color: var(--color-text); border-color: var(--color-text); }
 .btn-danger { background: transparent; color: var(--color-danger); border: 1px solid var(--color-danger); }
@@ -243,6 +245,21 @@ textarea { resize: vertical; min-height: 80px; }
 .auth-card .auth-sub { text-align: center; color: var(--color-muted); font-size: 0.875rem; margin-bottom: 1.75rem; }
 .auth-footer { text-align: center; margin-top: 1.25rem; font-size: 0.875rem; color: var(--color-muted); }
 .auth-footer a { color: var(--color-primary); text-decoration: none; }
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.25rem 0 1rem;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
 
 /* ─── Task list (project detail) ────────────────────────────── */
 .task-list { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }

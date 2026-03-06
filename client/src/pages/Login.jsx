@@ -36,6 +36,20 @@ export default function Login() {
     }
   }
 
+  async function handleDemo() {
+    setError('');
+    setLoading(true);
+    try {
+      const res = await api.post('/auth/demo');
+      login(res.data.token, res.data.user);
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Demo login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="auth-page">
       <div className="auth-card">
@@ -68,6 +82,18 @@ export default function Login() {
             </p>
           )}
         </form>
+
+        <div className="auth-divider">or</div>
+
+        <button
+          type="button"
+          className="btn btn-secondary"
+          style={{ width: '100%' }}
+          disabled={loading}
+          onClick={handleDemo}
+        >
+          Try Demo
+        </button>
 
         <p className="auth-footer">
           Don&apos;t have an account? <Link to="/register">Register</Link>

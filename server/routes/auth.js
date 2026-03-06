@@ -79,4 +79,18 @@ router.get('/me', require('../middleware/auth'), (req, res) => {
   res.json(user);
 });
 
+// POST /api/auth/demo  (instant login as the seeded demo account)
+router.post('/demo', (req, res) => {
+  const user = db.prepare("SELECT * FROM users WHERE email = 'demo@example.com'").get();
+  if (!user) {
+    return res.status(503).json({ message: 'Demo account unavailable.' });
+  }
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: '2h' }
+  );
+  res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+});
+
 module.exports = router;
