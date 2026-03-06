@@ -71,6 +71,8 @@ export default function ProjectDetail() {
   const tasks = project.tasks ?? [];
   const done  = tasks.filter((t) => t.status === 'done').length;
   const pct   = tasks.length > 0 ? Math.round((done / tasks.length) * 100) : 0;
+  const isOverdue = project.due_date && project.status !== 'completed'
+    && new Date(project.due_date + 'T23:59:59') < new Date();
 
   return (
     <div className="layout">
@@ -88,7 +90,11 @@ export default function ProjectDetail() {
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
               <span className={`badge badge-${project.status}`}>{project.status}</span>
               <span className={`badge badge-${project.priority}`}>{project.priority} priority</span>
-              {project.due_date && <span className="badge badge-low">Due {project.due_date}</span>}
+              {project.due_date && (
+                <span className={`badge ${isOverdue ? 'badge-overdue' : 'badge-low'}`}>
+                  {isOverdue ? '⚠ Overdue · ' : 'Due '}{ project.due_date}
+                </span>
+              )}
             </div>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -101,6 +107,12 @@ export default function ProjectDetail() {
           <p style={{ color: 'var(--color-muted)', marginBottom: '1.5rem', maxWidth: '640px' }}>
             {project.description}
           </p>
+        )}
+
+        {isOverdue && (
+          <div className="alert alert-overdue" style={{ marginBottom: '1.5rem' }}>
+            ⚠ This project is past its due date.
+          </div>
         )}
 
         {/* Progress */}
