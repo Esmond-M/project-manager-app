@@ -274,6 +274,8 @@ textarea { resize: vertical; min-height: 80px; }
 }
 .task-item.done .task-title { text-decoration: line-through; color: var(--color-muted); }
 .task-title { flex: 1; font-size: 0.9rem; }
+.task-drag-handle { cursor: grab; color: var(--color-muted); font-size: 1.1rem; padding: 0 0.25rem; user-select: none; touch-action: none; }
+.task-drag-handle:active { cursor: grabbing; }
 
 /* ─── Topbar ────────────────────────────────────────────────── */
 .topbar {

@@ -1,10 +1,59 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import {
+  DndContext, closestCenter, PointerSensor, useSensor, useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext, verticalListSortingStrategy,
+  useSortable, arrayMove,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import api from '../api';
 import Sidebar from '../components/Sidebar';
 import ProjectModal from '../components/ProjectModal';
 
 const TASK_STATUSES = ['open', 'in-progress', 'done'];
+
+function SortableTask({ task, onStatusChange, onDelete }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: task.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`task-item${task.status === 'done' ? ' done' : ''}`}
+    >
+      <span
+        className="task-drag-handle"
+        {...attributes}
+        {...listeners}
+        title="Drag to reorder"
+      >⠿</span>
+      <input
+        type="checkbox"
+        checked={task.status === 'done'}
+        onChange={() => onStatusChange(task.id, task.status === 'done' ? 'open' : 'done')}
+        style={{ width: 'auto', cursor: 'pointer', accentColor: 'var(--color-primary)' }}
+      />
+      <span className="task-title">{task.title}</span>
+      <select
+        value={task.status}
+        onChange={(e) => onStatusChange(task.id, e.target.value)}
+        style={{ width: 'auto', fontSize: '0.78rem', padding: '0.2rem 0.5rem' }}
+      >
+        {TASK_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+      </select>
+      <button className="btn btn-danger btn-sm" onClick={() => onDelete(task.id)}>✕</button>
+    </div>
+  );
+}
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -14,6 +63,10 @@ export default function ProjectDetail() {
   const [showEdit, setShowEdit]   = useState(false);
   const [newTask, setNewTask]     = useState('');
   const [addingTask, setAddingTask] = useState(false);
+
+  const sensors = useSensors(useSensor(PointerSensor, {
+    activationConstraint: { distance: 5 },
+  }));
 
   useEffect(() => {
     api.get(`/projects/${id}`)
@@ -57,6 +110,19 @@ export default function ProjectDetail() {
   function handleProjectSaved(updated) {
     setProject((p) => ({ ...p, ...updated }));
     setShowEdit(false);
+  }
+
+  async function handleDragEnd(event) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const tasks = project.tasks ?? [];
+    const oldIndex = tasks.findIndex((t) => t.id === active.id);
+    const newIndex = tasks.findIndex((t) => t.id === over.id);
+    const reordered = arrayMove(tasks, oldIndex, newIndex);
+
+    setProject((p) => ({ ...p, tasks: reordered }));
+    await api.patch(`/projects/${id}/tasks/reorder`, { ids: reordered.map((t) => t.id) });
   }
 
   if (loading) return (
@@ -149,32 +215,18 @@ export default function ProjectDetail() {
         )}
 
         <div className="task-list">
-          {tasks.map((task) => (
-            <div key={task.id} className={`task-item${task.status === 'done' ? ' done' : ''}`}>
-              <input
-                type="checkbox"
-                checked={task.status === 'done'}
-                onChange={() =>
-                  handleTaskStatus(task.id, task.status === 'done' ? 'open' : 'done')
-                }
-                style={{ width: 'auto', cursor: 'pointer', accentColor: 'var(--color-primary)' }}
-              />
-              <span className="task-title">{task.title}</span>
-              <select
-                value={task.status}
-                onChange={(e) => handleTaskStatus(task.id, e.target.value)}
-                style={{ width: 'auto', fontSize: '0.78rem', padding: '0.2rem 0.5rem' }}
-              >
-                {TASK_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
-              <button
-                className="btn btn-danger btn-sm"
-                onClick={() => handleDeleteTask(task.id)}
-              >
-                ✕
-              </button>
-            </div>
-          ))}
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
+              {tasks.map((task) => (
+                <SortableTask
+                  key={task.id}
+                  task={task}
+                  onStatusChange={handleTaskStatus}
+                  onDelete={handleDeleteTask}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
         </div>
 
         {showEdit && (

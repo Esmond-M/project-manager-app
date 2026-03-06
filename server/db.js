@@ -39,6 +39,20 @@ db.exec(`
   );
 `);
 
+// Add sort_order column if it doesn't exist yet (safe migration)
+try {
+  db.exec('ALTER TABLE tasks ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0');
+  // Backfill existing rows so order matches insertion order
+  db.exec(`
+    UPDATE tasks SET sort_order = (
+      SELECT COUNT(*) FROM tasks t2
+      WHERE t2.project_id = tasks.project_id AND t2.id <= tasks.id
+    ) - 1
+  `);
+} catch (e) {
+  // Column already exists — ignore
+}
+
 // Seed demo account + sample data if not already present
 const seedDemo = db.transaction(() => {
   const existing = db.prepare("SELECT id FROM users WHERE email = 'demo@example.com'").get();
